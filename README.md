@@ -41,6 +41,8 @@ dist
 DEEPSEEK_API_KEY=你的 DeepSeek API Key
 ```
 
+不要把 DeepSeek Key 写进前端代码、HTML、GitHub Pages 或提交到仓库。
+
 可选：
 
 ```bash
@@ -50,6 +52,10 @@ DEEPSEEK_MODEL=deepseek-chat
 ## OCR 说明
 
 DeepSeek API 不负责 OCR。当前 OCR 在浏览器端通过 `tesseract.js` 完成；如果截图识别不准，直接粘贴 JD 文本效果更稳定。
+
+## GitHub Pages 说明
+
+仓库包含 GitHub Pages 自动部署 workflow。GitHub Pages 只能托管静态前端，不能安全运行 `/api/generate`，因此 Pages 版本会自动使用本地规则兜底生成。要启用 DeepSeek 深度改写，请使用 Vercel 并配置 `DEEPSEEK_API_KEY`。
 
 ## 服务器部署
 
