@@ -46,6 +46,13 @@ h1 {
   letter-spacing: 0;
 }
 
+.apiStatus {
+  margin: 7px 0 0;
+  color: #52736b;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
 h2 {
   margin: 0;
   font-size: 17px;

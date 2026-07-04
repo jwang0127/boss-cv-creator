@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Camera, Copy, Download, FileText, ImageUp, RefreshCw, Sparkles, Trash2 } from "lucide-react";
 import html2canvas from "html2canvas";
@@ -257,9 +257,29 @@ function App() {
   const [genStatus, setGenStatus] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [source, setSource] = useState<"deepseek" | "local" | "idle">("idle");
+  const [apiStatus, setApiStatus] = useState("正在检测 DeepSeek API...");
   const resumeRef = useRef<HTMLDivElement>(null);
 
   const analysis = useMemo(() => analyze(resume, jd), [resume, jd]);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/health")
+      .then((res) => res.ok ? res.json() : Promise.reject(new Error("health unavailable")))
+      .then((data) => {
+        if (!cancelled) {
+          setApiStatus(data.deepseekConfigured ? `DeepSeek 已连接：${data.model}` : "DeepSeek API 未配置，将使用本地规则。");
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setApiStatus("当前环境不支持后端 API，将使用本地规则。");
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   function saveResume(value: string) {
     setResume(value);
@@ -437,6 +457,7 @@ function App() {
         <div>
           <p className="eyebrow">Boss 手机端投递</p>
           <h1>PDF 简历与打招呼语生成器</h1>
+          <p className="apiStatus">{apiStatus}</p>
         </div>
         <button
           className="iconButton"
