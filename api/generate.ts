@@ -113,7 +113,20 @@ function sanitizeGreeting(raw: unknown, title: string, matched: string, warnings
   const mismatch = warnings.some((warning) => /不匹配|迁移|差距|确认|开放度/.test(warning));
   const tooShort = text.length < 430;
   const lacksStructure = !/1[.、]|指标分析|工具|流程|跨文化|AI|ChatGPT|Codex|DeepSeek/.test(text);
-  if (tooShort || lacksStructure) {
+  const containsUnsupportedDetail = [
+    /ROI分析模型/,
+    /AI.*自动化.*报表模板/,
+    /自动化生成报表/,
+    /提升决策效率/,
+    /安克创新.*预算偏差控制在10%以内/,
+    /Best Buy.*减少约100万元潜在亏损/,
+    /安永.*(负责|主导|积累了|大型项目协作|跨文化沟通)/,
+    /陕西城投.*(负责|主导|积累了|大型项目协作|跨文化沟通)/,
+    /提升\s*\d+%/,
+    /降低\s*\d+%/
+  ].some((pattern) => pattern.test(text));
+
+  if (tooShort || lacksStructure || containsUnsupportedDetail) {
     return buildTemplateGreeting(title, matched, mismatch);
   }
   return text;
@@ -169,7 +182,8 @@ export default async function handler(request: any, response: any) {
 7. 简历内容可以根据JD重排和改写工作内容/技能，但不得编造具体公司、岗位、金额、时间、学校。
 8. 简历应保持专业、克制、一页可读。
 9. 禁止编造基础简历里没有的具体技能或结果，例如SQL、A/B测试、广告投放提升百分比、用户行为分析、产品迭代等；除非基础简历明确出现。
-10. 安永会计师事务所和陕西城投集团只能在打招呼语中作为“项目实习经历”轻描淡写提及，不得写进PDF简历，不得编造具体职责。`;
+10. 安永会计师事务所和陕西城投集团只能在打招呼语中作为“项目实习经历”轻描淡写提及，不得写进PDF简历，不得编造具体职责。
+11. 打招呼语也不能新增没有证据的具体成果，例如“ROI分析模型”“AI自动化生成报表模板”“提升决策效率”“提升xx%”“安永/陕西城投积累大型项目经验”等。`;
 
   const userPrompt = `请根据以下基础简历和岗位JD生成结果。
 
