@@ -168,9 +168,9 @@ function buildGreeting(resume: string, jd: string, analysis: Analysis, style: st
 
 2. 业务洞察与专项分析：能够通过数据分析定位关键问题，输出管理报表和经营复盘，也有针对业务策略建立专项分析模型的经验。
 
-3. 跨文化沟通与AI工具能力：长期海外学习经历让我能适应中英文沟通和跨文化协作；同时熟练使用ChatGPT、Codex、DeepSeek等AI工具提升资料整理、分析建模、报告撰写和自动化处理效率。
+3. 工具与自动化能力：熟练使用Excel、PowerPoint、Power BI、Tableau，也能使用飞书多维表格和影刀处理重复性工作；熟悉数据透视表、VLOOKUP/XLOOKUP、INDEX/MATCH、SUMIFS等函数和数据清洗方法。同时，我能熟练使用ChatGPT、Codex、DeepSeek等AI工具提升资料整理、分析建模、报告撰写和自动化处理效率。
 
-4. 工具与流程优化能力：熟练使用Excel、PowerPoint、Power BI、Tableau，熟悉数据透视表、VLOOKUP/XLOOKUP、INDEX/MATCH、SUMIFS等函数；也主导过财务SOP优化、账款预警机制建设和跨部门回款专项。
+4. 跨文化沟通、内控与流程优化：长期海外学习经历让我能适应中英文沟通和跨文化协作；也主导过财务SOP优化、账款预警机制建设和跨部门回款专项，熟悉流程梳理、风险识别和制度落地。
 
 ${closing}`;
 }

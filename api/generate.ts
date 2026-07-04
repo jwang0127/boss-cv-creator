@@ -84,6 +84,41 @@ function removeUnsupportedClaims(lines: string[], fallback: string[], baseResume
   return cleaned.length ? cleaned.slice(0, 5) : fallback;
 }
 
+function buildTemplateGreeting(title: string, matched: string, mismatch = false) {
+  const fitLine = mismatch
+    ? `我过往经历主要集中在财务分析、业务支持、数据处理和流程优化，和该岗位可能存在部分能力迁移空间，因此我更希望先确认岗位对复合型财务/数据背景候选人的开放度。`
+    : `我过往经历和岗位中的${matched || "数据分析、Excel、运营支持"}比较相关，主要优势集中在财务分析、业务支持、数据建模和流程优化。`;
+
+  const closing = mismatch
+    ? "如果贵司也考虑具备数据分析、跨部门沟通、财务分析和项目推进能力的候选人，我希望有机会进一步沟通。"
+    : "我希望把财务分析、业务支持与风险管控经验应用到贵司业务场景中，为业务发展和管理决策提供更扎实的数据与财务洞察。期待进一步沟通。";
+
+  return `您好，我是王春元，想应聘${title || "该岗位"}。我毕业于QS排名16位的多伦多大学经济统计学专业，曾在跨境电商企业安克创新负责北美地区13+大客户的线下财务支持工作，也有电商业务财务BP和经营分析经验；此外曾有安永会计师事务所和陕西城投集团项目实习经历。${fitLine}
+
+我比较突出的能力包括：
+
+1. 指标分析体系搭建：曾参与建立多渠道盈利模型和经营分析框架，能围绕毛利率、ROI、履约成本、预算偏差等指标拆解业务问题，支持策略制定与风险控制。
+
+2. 业务洞察与专项分析：能够通过数据分析定位关键问题，输出管理报表和经营复盘，也有针对业务策略建立专项分析模型的经验。
+
+3. 工具与自动化能力：熟练使用Excel、PowerPoint、Power BI、Tableau，也能使用飞书多维表格和影刀处理重复性工作；熟悉数据透视表、VLOOKUP/XLOOKUP、INDEX/MATCH、SUMIFS等函数和数据清洗方法。同时，我能熟练使用ChatGPT、Codex、DeepSeek等AI工具提升资料整理、分析建模、报告撰写和自动化处理效率。
+
+4. 跨文化沟通与流程优化：长期海外学习经历让我能适应中英文沟通和跨文化协作；也主导过财务SOP优化、账款预警机制建设和跨部门回款专项，熟悉流程梳理、风险识别和制度落地。
+
+${closing}`;
+}
+
+function sanitizeGreeting(raw: unknown, title: string, matched: string, warnings: string[]) {
+  const text = String(raw || "").trim();
+  const mismatch = warnings.some((warning) => /不匹配|迁移|差距|确认|开放度/.test(warning));
+  const tooShort = text.length < 430;
+  const lacksStructure = !/1[.、]|指标分析|工具|流程|跨文化|AI|ChatGPT|Codex|DeepSeek/.test(text);
+  if (tooShort || lacksStructure) {
+    return buildTemplateGreeting(title, matched, mismatch);
+  }
+  return text;
+}
+
 function sanitizeDraft(raw: any, fallbackTitle: string, fallbackMatched: string, baseResume: string): ResumeDraft {
   return {
     title: String(raw?.title || fallbackTitle || "目标岗位").slice(0, 30),
@@ -127,7 +162,7 @@ export default async function handler(request: any, response: any) {
 硬性规则：
 1. 必须完全围绕JD具体工作内容和任职要求改写，不要只替换岗位名。
 2. 不符合JD方向、无法迁移或会显得牵强的内容要删除或弱化，不要硬套经历。
-3. 打招呼语要说人话，有吸引力，适合BOSS直聘直接发送，不要像AI模板。
+3. 打招呼语要说人话，有吸引力，适合BOSS直聘直接发送，但必须保留用户给定模板的长度、结构和说服力。
 4. 打招呼语必须强调跨文化沟通优势、熟练使用AI产品提升效率，包括ChatGPT、Codex、DeepSeek等。
 5. 打招呼语可以提及用户声明的安永会计师事务所和陕西城投集团项目实习经历，但不要编造具体项目细节。
 6. 简历是给HR看的正式简历，不能出现“JD”“岗位匹配”“匹配亮点”“AI生成”“求职意向”等字样。
@@ -140,6 +175,23 @@ export default async function handler(request: any, response: any) {
 
 【用户的打招呼语目标】
 我要通过BOSS直聘应聘附件中岗位。请把以下提供的内容，对标截图中的具体岗位要求，重新优化调整，要完全贴合岗位工作内容和要求，把不符合以上要求的内容全部删除，重点突出、逻辑清晰、说人话，特别强调我具有跨文化沟通的优势，并能熟练使用AI产品如CHAT GPT、CODEX、DEEPSEEK等AI工具提升工作效率。曾经在安永会计师事务所和陕西城投集团有项目实习经历。要求极具吸引力，直接通过初筛，一定有面试机会。
+
+【打招呼语必须参考的结构和长度】
+您好，我是王春元，想应聘该岗位。我毕业于QS排名16位的多伦多大学经济统计学专业，曾在跨境电商企业安克创新负责北美地区13+大客户的线下财务支持工作，也有电商业务财务BP和经营分析经验。我过往经历和岗位中的数据、Excel、运营比较相关，主要优势集中在财务分析、业务支持、数据建模和流程优化。
+
+我比较突出的能力包括：
+
+1. 指标分析体系搭建：曾参与建立多渠道盈利模型和经营分析框架，能围绕毛利率、ROI、履约成本、预算偏差等指标拆解业务问题，支持策略制定与风险控制。
+
+2. 业务洞察与专项分析：能够通过数据分析定位关键问题，输出管理报表和经营复盘，也有针对业务策略建立专项分析模型的经验。
+
+3. 工具与自动化能力：熟练使用Excel、PowerPoint、Power BI、Tableau，也能使用飞书多维表格和影刀处理重复性工作；熟悉数据透视表、VLOOKUP/XLOOKUP、INDEX/MATCH、SUMIFS等函数和数据清洗方法。
+
+4. 内控与流程优化：主导过财务SOP优化及账款预警机制建设，熟悉内部控制流程搭建，能够支持财务制度完善与合规运行。
+
+我希望把财务分析、业务支持与风险管控经验应用于贵司，为业务发展与决策提供扎实的财务洞察。期待能够进一步沟通。
+
+要求：不要缩短成几句话。请保留上面这种“开头背景 + 4个能力点 + 结尾”的完整结构，字数建议450-750字。根据JD调整第一段的匹配关键词、能力点侧重和结尾，但不要只输出摘要。
 
 【基础简历】
 ${baseResume.slice(0, 6500)}
@@ -161,7 +213,7 @@ ${JSON.stringify(localAnalysis).slice(0, 1500)}
 
 请只返回JSON，不要Markdown，不要解释。格式：
 {
-  "greeting": "一段可直接复制到BOSS直聘的打招呼语，180-420字之间，可分段，但不要太长",
+  "greeting": "一段可直接复制到BOSS直聘的打招呼语，450-750字，必须包含开头背景、4个编号能力点和结尾，不要缩短成摘要",
   "draft": {
     "title": "识别到的岗位名，仅内部使用",
     "matched": "简历本次侧重方向，逗号分隔，禁止出现JD字样",
@@ -208,13 +260,14 @@ ${JSON.stringify(localAnalysis).slice(0, 1500)}
     const parsed = extractJson(content);
     const fallbackTitle = String(parsed?.draft?.title || "目标岗位");
     const fallbackMatched = String(parsed?.draft?.matched || localAnalysis.matchedKeywords?.slice?.(0, 6)?.join("、") || "");
+    const warnings = safeArray(parsed.warnings, []);
 
     return sendJson(response, 200, {
-      greeting: String(parsed.greeting || "").trim(),
+      greeting: sanitizeGreeting(parsed.greeting, fallbackTitle, fallbackMatched, warnings),
       draft: sanitizeDraft(parsed.draft, fallbackTitle, fallbackMatched, baseResume),
       fitScore: localAnalysis.score ?? undefined,
       source: "deepseek",
-      warnings: safeArray(parsed.warnings, [])
+      warnings
     });
   } catch (error) {
     return sendJson(response, 500, {
